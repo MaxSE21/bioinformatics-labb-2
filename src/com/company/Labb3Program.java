@@ -4,100 +4,220 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-
 //THE PLAN
 //: Take one coordinate form one file. Put it against all the other coordinates. If overlap. Get info on coordinate and print atoms info.
-//  Take the serial number of the one that clashed I
+//  Take the serial number of the ones that have already been clashed  with, if that one is in the list of already clashed atoms
+//  it should not print.
 
 public class Labb3Program {
 
-    private static Scanner scanner;
+    double x1;
+    double y1;
+    double z1;
 
+    double x2;
+    double y2;
+    double z2;
+
+    int overlaps = 0;
+    int checks = 0; //Used for debugging
+
+    private String file1;
+    private String file2;
+
+    private static Scanner scanner;
+    private static Scanner scanner2;
+
+    public boolean keepGoing = true;
 
     public Labb3Program() throws FileNotFoundException {
 
+        file1 = "E:\\Programming\\Java stuff\\bioinformatics-labb-3\\bioinformatics-labb-3\\src\\files\\1cdh.pdb";
+        file2 = "E:\\Programming\\Java stuff\\bioinformatics-labb-3\\bioinformatics-labb-3\\src\\files\\2csn.pdb";
 
+        System.out.println("Calculating overlap...");
 
+        this.compareFile(file1, file2);
 
-
-
-        this.getLineCoordinates("src/files/1cdh.pdb");
-
-
+        System.out.println();
+        System.out.println("Number of clashing atoms: " + overlaps);
+        System.out.println();
     }
 
 
-    public double[] getLineCoordinates(String filePath) throws FileNotFoundException {
 
-        double[] coordinates_array = {0.0, 0.0, 0.0};
+    public boolean checkIfOverlaps(){
 
-        String Xcoordinate = "";
-        String Ycoordinate = "";
-        String Zcoordinate = "";
+        double delta;
+        delta = (Math.sqrt(Math.pow((x2 - x1), 2)) + Math.pow((y2 - y1), 2) + Math.pow((z2 - z1), 2));
+
+        if (delta > 4){
+            keepGoing = false;
+            return false;
+        }else {
+            return true;
+        }
+    }
+
+
+
+    public void compareFile(String file1, String file2){
 
         try {
-            File file = new File(filePath);
+            File file = new File(file1);
             scanner = new Scanner(file);
             String lineContent = "";
 
-            System.out.println("Running from filepath: " + file);
-
-            int linecount = 0;
-
             while (scanner.hasNextLine()) {
 
-                linecount++;
+                int spaceCount = 0;
 
                 lineContent = scanner.nextLine();
-                String tempCoordinate = "x";
 
-                //Iterates through the line string.
-                for (int i = 7; i < (lineContent.length()); i++) {
+                if ((lineContent.startsWith("ATOM") || lineContent.startsWith("HETATM"))) {
 
+                    String Xcoordinate = "";
+                    String Ycoordinate = "";
+                    String Zcoordinate = "";
 
-                    //This will be hit when a space is found,
-                    // it will now write to Z coordinate instead of previous temp.
-                    if (lineContent.charAt(i) == ' ' && tempCoordinate == "y"){
-                        tempCoordinate = "z";
-                    }
-                    //This will be hit when a space is found,
-                    // it will now write to Y coordinate instead of previous temp.
-                    if (lineContent.charAt(i) == ' ' && tempCoordinate == "x") {
-                        tempCoordinate = "y";
-                    }
+                    for (int i = 0; i < (lineContent.length()-1); i++) {
 
+                        if((lineContent.charAt(i) == ' ') && !(lineContent.charAt(i+1) == ' ')){
+                            spaceCount++;
+                        }
 
-                    switch (tempCoordinate) {
-                        case "x" -> Xcoordinate += lineContent.charAt(i);
-                        case "y" -> Ycoordinate += lineContent.charAt(i);
-                        case "z" -> Zcoordinate += lineContent.charAt(i);
-                        default -> {
-                            System.out.println("Invalid token");
+                        //Gets X coordinate
+                        while (((spaceCount == 6) && (lineContent.charAt(i) != ' '))){
+                            i++;
+                            Xcoordinate += lineContent.charAt(i-1);
+
+                        }
+                        //Gets Y coordinate
+                        while (((spaceCount == 7) && (lineContent.charAt(i) != ' '))){
+                            i++;
+                            Ycoordinate += lineContent.charAt(i-1);
+
+                        }
+                        //Gets Z coordinate
+                        while (((spaceCount == 8) && (lineContent.charAt(i+1) != ' '))){
+                            i++;
+                            Zcoordinate += lineContent.charAt(i-1);
+                            if (lineContent.charAt(i+1) == ' '){
+                                Zcoordinate += lineContent.charAt(i);
+                            }
+                        }
+
+                        if (spaceCount >= 8){
+                            x1 = Double.parseDouble((Xcoordinate));
+                            y1 = Double.parseDouble((Ycoordinate));
+                            z1 = Double.parseDouble((Zcoordinate));
+                            compareToOtherData(file2);
+                            keepGoing = true;
                             break;
                         }
+                        //End of for loop
                     }
-
-                    //end of for loop
-
+                   //End of if line has ATOM
                 }
-
-                //resets starting coordinate
-                tempCoordinate = "x";
-
-                //Sets x, y ,z to list that can be put  as value for hashmap
-                coordinates_array[0] = Double.parseDouble((Xcoordinate));
-                coordinates_array[1] = Double.parseDouble((Ycoordinate));
-                coordinates_array[2] = Double.parseDouble((Zcoordinate));
-
-
+                //end of while has line loop
             }
+            //End of try
+        } catch (FileNotFoundException e) {throw new RuntimeException(e);}
+    }
 
 
-        } catch (Exception e) {throw new FileNotFoundException("File not found");}
 
+    //I believe the  problem with  this  one is that it checks thrugh liswt when it should only check the one thingyu
+    public void compareToOtherData(String file2){
 
+        try {
+            File file = new File(file2);
+            scanner2 = new Scanner(file);
 
-        return coordinates_array;
+            String lineContent = "";
+
+            String serialNumber = "";
+            String atomName = "";
+            String atomType = "";
+            String chainIdentifier = "";
+
+            while (scanner2.hasNextLine() && keepGoing) {
+
+                lineContent = scanner2.nextLine();
+
+                if ((lineContent.startsWith("ATOM") || lineContent.startsWith("HETATM"))) {
+
+                    String Xcoordinate = "";
+                    String Ycoordinate = "";
+                    String Zcoordinate = "";
+
+                    int spaceCount = 0;
+
+                    for (int i = 0; i < (lineContent.length())-1; i++) {
+
+                        if((lineContent.charAt(i) == ' ') && !(lineContent.charAt(i+1) == ' ')){
+                            spaceCount++;
+                        }
+
+                        /*//Gets serial number
+                        while (((spaceCount == 1) && (lineContent.charAt(i) != ' '))){
+                            i++;
+                            serialNumber += (lineContent.charAt(i - 1));
+                        }
+                        //Gets atom name
+                        while (((spaceCount == 1) && (lineContent.charAt(i) != ' '))){
+                            i++;
+                            atomName += (lineContent.charAt(i - 1));
+                        }
+                        //Gets atom type
+                        while (((spaceCount == 1) && (lineContent.charAt(i) != ' '))){
+                            i++;
+                            atomType += (lineContent.charAt(i - 1));
+                        }
+                        //gets chain identifier
+                        while (((spaceCount == 1) && (lineContent.charAt(i) != ' '))){
+                            i++;
+                            chainIdentifier += (lineContent.charAt(i - 1));
+                        }*/
+
+                        //For coordinates
+
+                        while (((spaceCount == 6) && (lineContent.charAt(i) != ' '))){
+                            i++;
+                            Xcoordinate += lineContent.charAt(i-1);
+                        }
+                        while (((spaceCount == 7) && (lineContent.charAt(i) != ' '))){
+                            i++;
+                            Ycoordinate += lineContent.charAt(i-1);
+                        }
+                        while (((spaceCount == 8) && (lineContent.charAt(i+1) != ' '))){
+                            i++;
+                            Zcoordinate += lineContent.charAt(i-1);
+                            if (lineContent.charAt(i+1) == ' '){
+                                Zcoordinate += lineContent.charAt(i);
+                            }
+                        }
+
+                        if (spaceCount >= 8){
+
+                            x2 = Double.parseDouble((Xcoordinate));
+                            y2 = Double.parseDouble((Ycoordinate));
+                            z2 = Double.parseDouble((Zcoordinate));
+                            //System.out.println("serial number: (" + serialNumber + ") Atom type: (" + atomType + ") Chain Identifier: (" + chainIdentifier + ") Atom name: ("+ atomName+") ");
+
+                            if (checkIfOverlaps()){
+                                overlaps++;
+                            }
+                            break;
+                        }
+                        //End of for loop
+                    }
+                    //End of if line has ATOM
+                }
+                //end of while has line loop
+            }
+            //End of try
+        } catch (FileNotFoundException e) {throw new RuntimeException(e);}
     }
 
 
@@ -112,26 +232,16 @@ public class Labb3Program {
 
 
 
-/*
-
-            int var = 0;
-
-            while(true) {
-                int tempCoordinate = "x";
 
 
-                do {
-                    if (!scanner.hasNextLine()) {
-                        break;
-                    }
 
-                    ++var;
-                    lineContent = scanner.nextLine();
-                    tempCoordinate = "x";
-                } while(!scanner.hasNext("ATOM "));
 
-                System.out.println("Atom found");
-*/
+
+
+
+
+
+
 
 
 
