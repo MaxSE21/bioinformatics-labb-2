@@ -99,31 +99,37 @@ public class Labb3Program {
 
                     for (int i = 0; i < (lineContent.length()-1); i++) {
 
-                        if((lineContent.charAt(i) == ' ') && !(lineContent.charAt(i+1) == ' ')){
+                        if (spaceCount > 1){
+                            if (!(lineContent.charAt(i-1) == ' ') && !(lineContent.charAt(i+1) == ' ') && (lineContent.charAt(i) == ' ')) {
+                                spaceCount--;
+                            }
+                        }
+
+                        //Adds a space for every
+                        if((lineContent.charAt(i) == ' ') && (!(lineContent.charAt(i+1) == ' '))){
                             spaceCount++;
                         }
 
-            /*            //Gets serial number
+                        //Gets serial number
                         while (((spaceCount == 1) && (lineContent.charAt(i) != ' '))){
                             i++;
-                            serialNumber += (lineContent.charAt(i - 1));
+                            serialNumber += (lineContent.charAt(i-1));
                         }
                         //Gets atom name
                         while (((spaceCount == 2) && (lineContent.charAt(i) != ' '))){
                             i++;
-                            atomName += (lineContent.charAt(i - 1));
+                            atomName += (lineContent.charAt(i-1));
                         }
                         //Gets atom type
                         while (((spaceCount == 3) && (lineContent.charAt(i) != ' '))){
-                            i++;
-                            atomType += (lineContent.charAt(i - 1));
+                            atomType += (lineContent.charAt(i-1));
                         }
                         //gets chain identifier
                         while (((spaceCount == 4) && (lineContent.charAt(i) != ' '))){
                             i++;
-                            chainIdentifier += (lineContent.charAt(i - 1));
+                            chainIdentifier += (lineContent.charAt(i-1));
                         }
-*/
+
                         //Gets X coordinate
                         while (((spaceCount == 6) && (lineContent.charAt(i) != ' '))){
                             i++;
