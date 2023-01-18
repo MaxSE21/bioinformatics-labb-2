@@ -5,9 +5,11 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 //THE PLAN
-//: Take one coordinate form one file. Put it against all the other coordinates. If overlap. Get info on coordinate and print atoms info.
-//  Take the serial number of the ones that have already been clashed  with, if that one is in the list of already clashed atoms
-//  it should not print.
+// : Take one coordinate form one file. Put it against all the other coordinates. If overlapped.
+//   Get info on coordinate and print atom info.
+//   Take the serial number of the ones that have already been clashed with,
+//   if that one is in the list of already clashed atoms
+//   it should not print.
 
 public class Labb3Program {
 
@@ -177,6 +179,8 @@ public class Labb3Program {
             Scanner scanner2;
             File file = new File(file2);
             scanner2 = new Scanner(file);
+
+            System.out.println("Going into second file");
 
             String lineContent = "";
 
