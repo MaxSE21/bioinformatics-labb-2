@@ -54,7 +54,7 @@ public class Labb3ProgramV2 {
                 spaceCount++;
             }
 
-            //Gets serial number
+
             while ((spaceCount == 3) && (lineContent.charAt(i) != ' ')) {
 
                 atomType += String.valueOf(lineContent.charAt(i));
@@ -136,7 +136,7 @@ public class Labb3ProgramV2 {
                 spaceCount++;
             }
 
-            //Gets serial number
+
             while ((spaceCount == 1) && (lineContent.charAt(i) != ' ')) {
 
                 atomNumber += String.valueOf(lineContent.charAt(i));
@@ -164,7 +164,7 @@ public class Labb3ProgramV2 {
                 spaceCount++;
             }
 
-            //Gets serial number
+
             while ((spaceCount == 5) && (lineContent.charAt(i) != ' ')) {
 
                 sequenceNumber += String.valueOf(lineContent.charAt(i));
@@ -179,43 +179,12 @@ public class Labb3ProgramV2 {
         return "Failed getting atom number";
     }
 
-
-    public void read_file(File file) {
-
-        //We will get a list with atom coordinates where the index will be the atom number.
-
-        try {
-
-
-            System.out.println("Calculating overlap...");
-            Scanner scanner;
-            scanner = new Scanner(file);
-            String lineContent = "";
-
-            while (scanner.hasNextLine()) {
-
-                lineContent = scanner.nextLine();
-
-                if ((lineContent.startsWith("ATOM") || lineContent.startsWith("HETATM"))) {
-
-                    //Write code here
-
-                }
-            }
-
-
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public boolean doesAtomOverlap(ArrayList coordinateSubList1, ArrayList coordinateSubList2) {
 
         double delta = 0;
 
         //Formula used:
         //delta = (Math.sqrt(Math.pow((x2 - x1), 2)) + Math.pow((y2 - y1), 2) + Math.pow((z2 - z1), 2));
-
 
         delta = (
                 Math.sqrt(
@@ -225,11 +194,7 @@ public class Labb3ProgramV2 {
                 )
         );
 
-        if (delta >= 4) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(delta >= 4);
 
     }
 
